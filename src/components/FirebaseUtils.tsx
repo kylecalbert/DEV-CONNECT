@@ -1,4 +1,4 @@
-// firebaseUtils.ts
+// FirebaseUtils.tsx
 import { doc, getFirestore, setDoc, getDoc } from 'firebase/firestore';
 import { UserCredential } from 'firebase/auth';
 
@@ -17,23 +17,15 @@ export async function userExistsInDatabase(uid: string): Promise<boolean> {
 
 // Function to save the user profile to Firestore
 export async function saveUserProfile(
-  userCredential: UserCredential
+  uid: string,
+  profileData: any // Replace 'any' with the specific type of profile data you want to save
 ): Promise<void> {
-  const { displayName, email, uid } = userCredential.user;
   const db = getFirestore();
   const userRef = doc(db, 'users', uid);
   const userSnapshot = await getDoc(userRef);
 
   if (!userSnapshot.exists()) {
-    const [firstName, lastName] = displayName?.split(' ') || [null, null];
-
     // Save the user profile to Firestore
-    await setDoc(userRef, {
-      email,
-      displayName,
-      firstName,
-      lastName,
-      // Add any other additional profile information you need
-    });
+    await setDoc(userRef, profileData);
   }
 }

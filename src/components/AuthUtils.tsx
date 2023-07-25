@@ -18,13 +18,16 @@ export function useAuthentication() {
         const existsInDatabase = await userExistsInDatabase(uid);
 
         if (!existsInDatabase) {
-          // If the user does not exist in Firestore, create their profile
-          await saveUserProfile(userCredential);
+          // If the user does not exist in Firestore, return a flag indicating that the profile needs to be created
+          return true;
         }
       }
     } catch (error) {
       console.log(error);
     }
+
+    // If the user exists in Firestore or there was an error, return false
+    return false;
   };
 
   const handleGoogleSignOut = async () => {
