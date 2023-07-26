@@ -32,7 +32,7 @@ const ProfileCreation = () => {
       if (user && user.uid) {
         const userExists = await userExistsInDatabase(user.uid);
         if (userExists) {
-          navigate('/'); // Redirect to the login page if the user has a complete profile
+          navigate('/AvailiabulityPage'); // Redirect to the login page if the user has a complete profile
         }
       }
     };
@@ -70,7 +70,7 @@ const ProfileCreation = () => {
       <TextField
         label="Skill"
         variant="outlined"
-        value={skills}
+        value={newSkill}
         onChange={handleSkillChange}
       />
 
