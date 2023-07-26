@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthentication } from './AuthUtils';
 import { saveUserProfile } from './FirebaseUtils';
-import Box from '@mui/material';
+import { Box } from '@mui/material';
 import { userExistsInDatabase } from './FirebaseUtils';
-
 import {
   Button,
   TextField,
@@ -16,10 +15,16 @@ import {
 import { useNavigate } from 'react-router-dom';
 
 const ProfileCreation = () => {
-  const { user } = useAuthentication();
-  const [skills, setSkills] = useState<string[]>([]);
-  const [newSkill, setNewSkill] = useState<string>('');
   const navigate = useNavigate();
+  const { user } = useAuthentication();
+
+  const [newSkill, setNewSkill] = useState<string>('');
+  const [skills, setSkills] = useState<string[]>([]);
+
+  ////will have an input field for user to enter their skill
+  ///after the user adds their skill, they will then be able to see under the input field
+  ///the user should be able to delete the skill
+  //users can enter 4 skills, after that they should be able to save their profile
 
   useEffect(() => {
     // Check if the user has a complete profile in Firestore
@@ -40,7 +45,6 @@ const ProfileCreation = () => {
   };
 
   const handleAddSkill = () => {
-    // Add the new skill to the skills state
     if (newSkill.trim() !== '') {
       setSkills((prevSkills) => [...prevSkills, newSkill]);
       setNewSkill(''); // Clear the input field after adding the skill
@@ -48,17 +52,16 @@ const ProfileCreation = () => {
   };
 
   const handleSaveProfile = async () => {
-    // Save the user profile to Firestore
     if (user && user.uid && user.firstName && user.lastName && user.email) {
       const profileData = {
         firstName: user.firstName,
         lastName: user.lastName,
-        skills,
         email: user.email,
+        skills,
       };
 
       await saveUserProfile(user.uid, profileData);
-      navigate('/'); // Redirect to the login page after saving the profile
+      navigate('/');
     }
   };
 
@@ -67,15 +70,21 @@ const ProfileCreation = () => {
       <TextField
         label="Skill"
         variant="outlined"
+        value={skills}
         onChange={handleSkillChange}
-        value={newSkill}
       />
-      <Button variant="contained" onClick={handleAddSkill}>
-        Add Skill
-      </Button>
-      <Button variant="contained" onClick={handleSaveProfile}>
-        Save Profile
-      </Button>
+
+      <Box>
+        <Button variant="contained" onClick={handleAddSkill}>
+          Add Skill
+        </Button>
+      </Box>
+
+      <Box>
+        <Button variant="contained" onClick={handleSaveProfile}>
+          Create Profile
+        </Button>
+      </Box>
     </div>
   );
 };
