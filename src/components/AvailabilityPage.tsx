@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
-import Button from '@mui/material/Button';
+import {
+  Container,
+  Typography,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Button,
+} from '@mui/material';
+import { useAuthentication } from './AuthUtils';
+import { saveUserAvailability } from './FirebaseUtils';
+import { useNavigate } from 'react-router-dom';
 
 const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
-const hours = Array.from({ length: 8 }, (_, index) => index + 9); // 9 AM to 4 PM
+const hours = [9, 10, 11, 12, 13, 14, 15, 16]; // 9 AM to 4 PM
 const minutes = ['00', '15', '30', '45'];
-
 const durations = [5, 10, 15, 20, 25, 30]; // Available durations in minutes
 
 const AvailabilityPage = () => {
@@ -19,14 +23,19 @@ const AvailabilityPage = () => {
   const [selectedDay, setSelectedDay] = useState<string>(daysOfWeek[0]);
   const [selectedHour, setSelectedHour] = useState<number>(hours[0]);
   const [selectedMinute, setSelectedMinute] = useState<string>(minutes[0]);
-  const [selectedDuration, setSelectedDuration] = useState<number>(durations[0]);
+  const [selectedDuration, setSelectedDuration] = useState<number>(
+    durations[0]
+  );
+
+  const { user } = useAuthentication();
+  const navigate = useNavigate();
 
   const handleAddTimeSlot = () => {
     const timeSlot = `${selectedDay} ${selectedHour}:${selectedMinute} (${selectedDuration} min)`;
 
     // Check if there is an existing time slot with the same hour
-    const existingTimeSlotIndex = selectedTimeSlots.findIndex(
-      (slot) => slot.startsWith(`${selectedDay} ${selectedHour}:`)
+    const existingTimeSlotIndex = selectedTimeSlots.findIndex((slot) =>
+      slot.startsWith(`${selectedDay} ${selectedHour}:`)
     );
 
     if (existingTimeSlotIndex !== -1) {
@@ -41,12 +50,24 @@ const AvailabilityPage = () => {
   };
 
   const handleRemoveTimeSlot = (timeSlot: string) => {
-    setSelectedTimeSlots((prevSelected) => prevSelected.filter((slot) => slot !== timeSlot));
+    setSelectedTimeSlots((prevSelected) =>
+      prevSelected.filter((slot) => slot !== timeSlot)
+    );
   };
 
-  const handleSaveAvailability = () => {
+  const handleSaveAvailability = async () => {
     // Save availability to the database (Firebase or local storage)
     console.log('Selected Time Slots:', selectedTimeSlots);
+
+    // Assuming the availability data is stored as an array of time slots in selectedTimeSlots
+    if (user && user.uid) {
+      const availabilityData = {
+        timeSlots: selectedTimeSlots,
+      };
+
+      await saveUserAvailability(user.uid, availabilityData);
+      navigate('/'); // Redirect to the homepage after saving the availability
+    }
   };
 
   return (

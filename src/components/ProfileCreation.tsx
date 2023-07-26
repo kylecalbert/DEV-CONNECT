@@ -32,7 +32,7 @@ const ProfileCreation = () => {
       if (user && user.uid) {
         const userExists = await userExistsInDatabase(user.uid);
         if (userExists) {
-          navigate('/AvailiabulityPage'); // Redirect to the login page if the user has a complete profile
+          navigate('/Availiability'); // Redirect to the login page if the user has a complete profile
         }
       }
     };
