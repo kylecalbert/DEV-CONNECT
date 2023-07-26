@@ -1,22 +1,90 @@
-// ProfileCreation.tsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuthentication } from './AuthUtils';
+import { saveUserProfile } from './FirebaseUtils';
+import { Box } from '@mui/material';
+import { userExistsInDatabase } from './FirebaseUtils';
+import {
+  Button,
+  TextField,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemSecondaryAction,
+  IconButton,
+} from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const ProfileCreation = () => {
+  const navigate = useNavigate();
   const { user } = useAuthentication();
+
+  const [newSkill, setNewSkill] = useState<string>('');
+  const [skills, setSkills] = useState<string[]>([]);
+
+  ////will have an input field for user to enter their skill
+  ///after the user adds their skill, they will then be able to see under the input field
+  ///the user should be able to delete the skill
+  //users can enter 4 skills, after that they should be able to save their profile
+
+  useEffect(() => {
+    // Check if the user has a complete profile in Firestore
+    const checkProfileCompletion = async () => {
+      if (user && user.uid) {
+        const userExists = await userExistsInDatabase(user.uid);
+        if (userExists) {
+          navigate('/'); // Redirect to the login page if the user has a complete profile
+        }
+      }
+    };
+
+    checkProfileCompletion();
+  }, [user, navigate]);
+
+  const handleSkillChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNewSkill(event.target.value);
+  };
+
+  const handleAddSkill = () => {
+    if (newSkill.trim() !== '') {
+      setSkills((prevSkills) => [...prevSkills, newSkill]);
+      setNewSkill(''); // Clear the input field after adding the skill
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    if (user && user.uid && user.firstName && user.lastName && user.email) {
+      const profileData = {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        skills,
+      };
+
+      await saveUserProfile(user.uid, profileData);
+      navigate('/');
+    }
+  };
 
   return (
     <div>
-      {user ? (
-        <div>
-          <h2>Welcome, {user.displayName}</h2>
-          {user.firstName && <p>First Name: {user.firstName}</p>}
-          {user.lastName && <p>Last Name: {user.lastName}</p>}
-          {/* Here, you can add the form to create a profile */}
-        </div>
-      ) : (
-        <div>Please sign in to create a profile.</div>
-      )}
+      <TextField
+        label="Skill"
+        variant="outlined"
+        value={skills}
+        onChange={handleSkillChange}
+      />
+
+      <Box>
+        <Button variant="contained" onClick={handleAddSkill}>
+          Add Skill
+        </Button>
+      </Box>
+
+      <Box>
+        <Button variant="contained" onClick={handleSaveProfile}>
+          Create Profile
+        </Button>
+      </Box>
     </div>
   );
 };
