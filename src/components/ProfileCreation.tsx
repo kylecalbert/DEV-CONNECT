@@ -1,4 +1,3 @@
-// ProfileCreation.tsx
 import React, { useState, useEffect } from 'react';
 import { useAuthentication } from './AuthUtils';
 import { saveUserProfile } from './FirebaseUtils';
@@ -28,7 +27,7 @@ const ProfileCreation = () => {
       if (user && user.uid) {
         const userExists = await userExistsInDatabase(user.uid);
         if (userExists) {
-          navigate('/'); // Redirect to login page if the user has a complete profile
+          navigate('/'); // Redirect to the login page if the user has a complete profile
         }
       }
     };
@@ -40,10 +39,26 @@ const ProfileCreation = () => {
     setNewSkill(event.target.value);
   };
 
+  const handleAddSkill = () => {
+    // Add the new skill to the skills state
+    if (newSkill.trim() !== '') {
+      setSkills((prevSkills) => [...prevSkills, newSkill]);
+      setNewSkill(''); // Clear the input field after adding the skill
+    }
+  };
+
   const handleSaveProfile = async () => {
-    // Save the skills to the user's profile in Firestore
-    if (user && user.uid) {
-      await saveUserProfile(user.uid, { skills });
+    // Save the user profile to Firestore
+    if (user && user.uid && user.firstName && user.lastName && user.email) {
+      const profileData = {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        skills,
+        email: user.email,
+      };
+
+      await saveUserProfile(user.uid, profileData);
+      navigate('/'); // Redirect to the login page after saving the profile
     }
   };
 
@@ -55,6 +70,9 @@ const ProfileCreation = () => {
         onChange={handleSkillChange}
         value={newSkill}
       />
+      <Button variant="contained" onClick={handleAddSkill}>
+        Add Skill
+      </Button>
       <Button variant="contained" onClick={handleSaveProfile}>
         Save Profile
       </Button>
