@@ -2,6 +2,7 @@
 import React from 'react';
 import './App.css';
 import { AuthContextProvider } from './components/context/AuthContext';
+import { AvailabilityProvider } from './components/context/AvailabilityContext';
 import {
   createBrowserRouter,
   createRoutesFromElements,
@@ -25,7 +26,9 @@ function App() {
 
   return (
     <AuthContextProvider>
-      <RouterProvider router={router} />
+      <AvailabilityProvider>
+        <RouterProvider router={router} />
+      </AvailabilityProvider>
     </AuthContextProvider>
   );
 }
