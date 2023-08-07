@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+// AvailabilityPage.tsx
+
+import React, { useEffect, useState } from 'react';
 import {
   Container,
   Typography,
@@ -9,9 +11,8 @@ import {
   Button,
 } from '@mui/material';
 import { useAuthentication } from './AuthUtils';
-import { saveUserAvailability } from './FirebaseUtils';
+import { saveUserAvailability, fetchUserAvailability } from './FirebaseUtils';
 import { useNavigate } from 'react-router-dom';
-import { useAvailability } from './context/AvailabilityContext';
 
 const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
@@ -26,35 +27,55 @@ const AvailabilityPage = () => {
   const [selectedDuration, setSelectedDuration] = useState<number>(
     durations[0]
   );
-
-  const { selectedTimeSlots, setSelectedTimeSlots } = useAvailability();
+  const [selectedTimeSlots, setSelectedTimeSlots] = useState<string[]>([]);
 
   const { user } = useAuthentication();
   const navigate = useNavigate();
 
-  //handle add
-  const handleAddTimeSlot = () => {
-    console.log('i am here');
-    const timeSlot = `${selectedDay} ${selectedHour}:${selectedMinute} (${selectedDuration} min)`;
-    console.log(timeSlot);
+  // Fetch user's availability from Firebase when the component mounts
+  useEffect(() => {
+    const fetchAvailability = async () => {
+      if (user && user.uid) {
+        try {
+          const availability = await fetchUserAvailability(user.uid);
+          setSelectedTimeSlots(availability);
+        } catch (error) {
+          console.error('Error fetching availability:', error);
+        }
+      }
+    };
 
-    // Check if the time slot already exists in selectedTimeSlots
+    fetchAvailability();
+  }, [user]);
+
+  const handleAddTimeSlot = () => {
+    const timeSlot = `${selectedDay} ${selectedHour}:${selectedMinute} (${selectedDuration} min)`;
     const isExistingSlot = selectedTimeSlots.some((slot) => slot === timeSlot);
 
     if (isExistingSlot) {
-      // Handle the case where the time slot already exists
       alert('This time slot already exists. Please choose a different one.');
       return;
     }
 
     setSelectedTimeSlots((prevSelected) => [...prevSelected, timeSlot]);
-    console.log(selectedTimeSlots);
   };
 
   const handleRemoveTimeSlot = (timeSlot: string) => {
     setSelectedTimeSlots((prevSelected) =>
       prevSelected.filter((slot) => slot !== timeSlot)
     );
+  };
+
+  const handleSaveAvailability = async () => {
+    if (user && user.uid) {
+      try {
+        await saveUserAvailability(user.uid, selectedTimeSlots);
+        alert('Availability saved successfully!');
+      } catch (error) {
+        console.error('Error saving availability:', error);
+        alert('An error occurred while saving availability.');
+      }
+    }
   };
 
   return (
@@ -133,9 +154,9 @@ const AvailabilityPage = () => {
         <Button
           variant="contained"
           color="primary"
-          onClick={handleAddTimeSlot}
           fullWidth
           style={{ marginTop: '20px' }}
+          onClick={handleAddTimeSlot}
         >
           Add Time Slot
         </Button>
@@ -160,6 +181,7 @@ const AvailabilityPage = () => {
           color="primary"
           fullWidth
           style={{ marginTop: '20px' }}
+          onClick={handleSaveAvailability}
         >
           Save Availability
         </Button>

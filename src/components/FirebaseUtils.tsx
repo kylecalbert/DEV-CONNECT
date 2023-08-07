@@ -1,10 +1,11 @@
-// FirebaseUtils.tsx
 import {
   doc,
   getFirestore,
   setDoc,
   getDoc,
   updateDoc,
+  collection,
+  getDocs,
 } from 'firebase/firestore';
 import { UserCredential } from 'firebase/auth';
 
@@ -39,9 +40,46 @@ export async function saveUserProfile(
 // Function to save user availability to Firestore
 export async function saveUserAvailability(
   uid: string,
-  availabilityData: any // Replace 'any' with the specific type of availability data you want to save
+  availabilityData: string[]
 ): Promise<void> {
-  const db = getFirestore();
-  const userRef = doc(db, 'users', uid);
-  await updateDoc(userRef, { availability: availabilityData });
+  try {
+    const db = getFirestore();
+    const userRef = doc(db, 'users', uid);
+    await updateDoc(userRef, { availability: availabilityData });
+  } catch (error) {
+    console.error('Error saving availability:', error);
+    throw error;
+  }
+}
+
+// Function to fetch all users from Firestore
+export async function fetchAllUsers(): Promise<any[]> {
+  try {
+    const db = getFirestore();
+    const usersCollection = collection(db, 'users');
+    const usersSnapshot = await getDocs(usersCollection);
+    const users = usersSnapshot.docs.map((doc) => doc.data());
+    return users;
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    throw error;
+  }
+}
+
+export async function fetchUserAvailability(uid: string): Promise<string[]> {
+  try {
+    const db = getFirestore();
+    const userRef = doc(db, 'users', uid);
+    const userSnapshot = await getDoc(userRef);
+
+    if (userSnapshot.exists()) {
+      const userData = userSnapshot.data();
+      return userData.availability || [];
+    } else {
+      return [];
+    }
+  } catch (error) {
+    console.error('Error fetching user availability:', error);
+    throw error;
+  }
 }

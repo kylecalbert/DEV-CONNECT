@@ -3,15 +3,7 @@ import { useAuthentication } from './AuthUtils';
 import { saveUserProfile } from './FirebaseUtils';
 import { Box } from '@mui/material';
 import { userExistsInDatabase } from './FirebaseUtils';
-import {
-  Button,
-  TextField,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
-  IconButton,
-} from '@mui/material';
+import { Button, TextField } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 const ProfileCreation = () => {
@@ -45,9 +37,9 @@ const ProfileCreation = () => {
   };
 
   const handleAddSkill = () => {
-    if (newSkill.trim() !== '') {
+    if (newSkill.trim() !== '' && skills.length < 4) {
       setSkills((prevSkills) => [...prevSkills, newSkill]);
-      setNewSkill(''); // Clear the input field after adding the skill
+      setNewSkill('');
     }
   };
 
