@@ -16,15 +16,15 @@ import { useNavigate } from 'react-router-dom';
 
 const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
-const hours = [9, 10, 11, 12, 13, 14, 15, 16]; // 9 AM to 4 PM
+const hours = ['9', '10', '11', '12', '13', '14', '15', '16']; // 9 AM to 4 PM
 const minutes = ['00', '15', '30', '45'];
-const durations = [5, 10, 15, 20, 25, 30]; // Available durations in minutes
+const durations = ['5', '10', '15', '20', '25', '30']; // Available durations in minutes
 
 const AvailabilityPage = () => {
   const [selectedDay, setSelectedDay] = useState<string>(daysOfWeek[0]);
-  const [selectedHour, setSelectedHour] = useState<number>(hours[0]);
+  const [selectedHour, setSelectedHour] = useState<string>(hours[0]);
   const [selectedMinute, setSelectedMinute] = useState<string>(minutes[0]);
-  const [selectedDuration, setSelectedDuration] = useState<number>(
+  const [selectedDuration, setSelectedDuration] = useState<string>(
     durations[0]
   );
   const [selectedTimeSlots, setSelectedTimeSlots] = useState<string[]>([]);
@@ -94,6 +94,7 @@ const AvailabilityPage = () => {
         <FormControl fullWidth style={{ marginTop: '10px', padding: '8px' }}>
           <InputLabel id="day-label">Select Day</InputLabel>
           <Select
+            inputProps={{ 'data-testid': 'day-input' }}
             labelId="day-label"
             value={selectedDay}
             onChange={(e) => setSelectedDay(e.target.value)}
@@ -110,8 +111,11 @@ const AvailabilityPage = () => {
           <InputLabel id="hour-label">Select Hour</InputLabel>
           <Select
             labelId="hour-label"
+            inputProps={{ 'data-testid': 'hour-input' }}
             value={selectedHour}
-            onChange={(e) => setSelectedHour(Number(e.target.value))}
+            onChange={(e) => {
+              setSelectedHour(e.target.value);
+            }}
           >
             {hours.map((hour) => (
               <MenuItem key={hour} value={hour}>
@@ -125,6 +129,7 @@ const AvailabilityPage = () => {
           <InputLabel id="minutes-label">Select Minutes</InputLabel>
           <Select
             labelId="minutes-label"
+            inputProps={{ 'data-testid': 'minute-input' }}
             value={selectedMinute}
             onChange={(e) => setSelectedMinute(e.target.value)}
           >
@@ -140,8 +145,9 @@ const AvailabilityPage = () => {
           <InputLabel id="duration-label">Select Duration</InputLabel>
           <Select
             labelId="duration-label"
+            inputProps={{ 'data-testid': 'duration-input' }}
             value={selectedDuration}
-            onChange={(e) => setSelectedDuration(Number(e.target.value))}
+            onChange={(e) => setSelectedDuration(e.target.value)}
           >
             {durations.map((duration) => (
               <MenuItem key={duration} value={duration}>
@@ -157,6 +163,7 @@ const AvailabilityPage = () => {
           fullWidth
           style={{ marginTop: '20px' }}
           onClick={handleAddTimeSlot}
+          data-testid="add-timeslot"
         >
           Add Time Slot
         </Button>
