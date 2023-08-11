@@ -12,7 +12,7 @@ import {
 import Login from './components/Login';
 import ProfileCreation from './components/ProfileCreation';
 import AvailabilityPage from './components/AvailabilityPage';
-import UserListPage from './components/List';
+import UserListPage from './components/UserListPage';
 function App() {
   const router = createBrowserRouter(
     createRoutesFromElements(

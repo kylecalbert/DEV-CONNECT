@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { fetchAllUsers } from './FirebaseUtils';
+import UserCard from './UserCard';
 
-// Define the shape of a user object
 interface User {
   uid: string;
   displayName: string;
@@ -16,7 +16,6 @@ const UserListPage = () => {
   const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    // Fetch all users when the component mounts
     const fetchUsers = async () => {
       try {
         const allUsers = await fetchAllUsers();
@@ -32,17 +31,11 @@ const UserListPage = () => {
   return (
     <div>
       <h1>User List</h1>
-      <ul>
+      <div style={{ maxHeight: '500px', overflowY: 'scroll' }}>
         {users.map((user) => (
-          <li key={user.uid}>
-            <h3>{user.displayName}</h3>
-            <p>Email: {user.email}</p>
-            <p> Name: {user.firstName}</p>
-            <p>Availability: {user.availability.join(', ')}</p>
-            <p>Skills: {user.skills.join(',')}</p>
-          </li>
+          <UserCard key={user.uid} user={user} />
         ))}
-      </ul>
+      </div>
     </div>
   );
 };
