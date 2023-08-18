@@ -4,26 +4,10 @@ import { Box, Button, Typography } from '@mui/material';
 import GoogleButton from 'react-google-button';
 import { useAuthentication } from './AuthUtils';
 import { useNavigate } from 'react-router-dom';
-import { userExistsInDatabase } from './FirebaseUtils';
 
 function Login() {
   const { user, handleGoogleSignIn, handleGoogleSignOut } = useAuthentication();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // Check if the user is logged in
-    if (user?.uid) {
-      // Use optional chaining to access user.uid
-      // Check if the user has a complete profile in Firestore
-      const checkUserAndRedirect = async () => {
-        const userExists = await userExistsInDatabase(user.uid ?? ''); // Use nullish coalescing to provide an empty string as default
-        if (!userExists) {
-          navigate('/profileCreation'); // Navigate to the profile creation page
-        }
-      };
-      checkUserAndRedirect();
-    }
-  }, [user, navigate]);
 
   return (
     <Box

@@ -11,10 +11,6 @@ const renderAvailabilityPage = () => {
   );
 };
 
-const mockUser = {
-  uid: 'test-user',
-};
-
 describe('AvailabilityPage', () => {
   it('should render the Availabiltiy page correctly', () => {
     renderAvailabilityPage();
@@ -84,4 +80,29 @@ describe('AvailabilityPage', () => {
     const newTimeSlot = 'Monday 11:15 (25 min)';
     expect(screen.getByText(newTimeSlot)).toBeInTheDocument();
   });
+});
+
+it('should remove the availability when the user clicks remove button', () => {
+  renderAvailabilityPage();
+
+  const selectDayDropdown = screen.getByTestId('day-input');
+  const selectHourDropdown = screen.getByTestId('hour-input');
+  const selectMinuteDropdown = screen.getByTestId('minute-input');
+  const selectDurationDropdown = screen.getByTestId('duration-input');
+
+  fireEvent.change(selectDayDropdown, { target: { value: 'Monday' } });
+  fireEvent.change(selectHourDropdown, { target: { value: '11' } });
+  fireEvent.change(selectMinuteDropdown, { target: { value: '15' } });
+  fireEvent.change(selectDurationDropdown, { target: { value: '25' } });
+
+  const addButton = screen.getByTestId('add-timeslot');
+
+  fireEvent.click(addButton);
+  const addedTimeSlot = 'Monday 11:15 (25 min)';
+  expect(screen.getByText(addedTimeSlot)).toBeInTheDocument();
+
+  const removeButton = screen.getByTestId('remove-timeslot');
+  fireEvent.click(removeButton);
+
+  expect(screen.queryByText(addedTimeSlot)).toBeNull();
 });

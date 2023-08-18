@@ -32,12 +32,12 @@ const AvailabilityPage = () => {
   const { user } = useAuthentication();
   const navigate = useNavigate();
 
-  // Fetch user's availability from Firebase when the component mounts
+  // if the user is logged in, then fetch their availability...
   useEffect(() => {
     const fetchAvailability = async () => {
       if (user && user.uid) {
         try {
-          const availability = await fetchUserAvailability(user.uid);
+          const availability = await fetchUserAvailability(user.uid); //
           setSelectedTimeSlots(availability);
         } catch (error) {
           console.error('Error fetching availability:', error);
@@ -176,6 +176,7 @@ const AvailabilityPage = () => {
                 color="secondary"
                 size="small"
                 onClick={() => handleRemoveTimeSlot(timeSlot)}
+                data-testid="remove-timeslot"
               >
                 Remove
               </Button>

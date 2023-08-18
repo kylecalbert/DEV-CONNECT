@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthentication } from './AuthUtils';
 import { saveUserProfile } from './FirebaseUtils';
-import { Box } from '@mui/material';
-import { userExistsInDatabase } from './FirebaseUtils';
+import { Box, Typography, Chip } from '@mui/material';
 import { Button, TextField } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
@@ -18,29 +17,19 @@ const ProfileCreation = () => {
   ///the user should be able to delete the skill
   //users can enter 4 skills, after that they should be able to save their profile
 
-  useEffect(() => {
-    // Check if the user has a complete profile in Firestore
-    const checkProfileCompletion = async () => {
-      if (user && user.uid) {
-        const userExists = await userExistsInDatabase(user.uid);
-        if (userExists) {
-          navigate('/Availiability'); // Redirect to the login page if the user has a complete profile
-        }
-      }
-    };
-
-    checkProfileCompletion();
-  }, [user, navigate]);
-
   const handleSkillChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNewSkill(event.target.value);
   };
-
   const handleAddSkill = () => {
     if (newSkill.trim() !== '' && skills.length < 4) {
       setSkills((prevSkills) => [...prevSkills, newSkill]);
       setNewSkill('');
     }
+  };
+  const handleRemoveSkill = (skillToRemove: string) => {
+    setSkills((prevSkills) =>
+      prevSkills.filter((skill) => skill !== skillToRemove)
+    );
   };
 
   const handleSaveProfile = async () => {
@@ -53,31 +42,93 @@ const ProfileCreation = () => {
       };
 
       await saveUserProfile(user.uid, profileData);
-      navigate('/');
+      navigate('/Availiability');
     }
   };
 
   return (
-    <div>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+      }}
+    >
+      <Typography variant="h4" sx={{ marginBottom: '16px' }}>
+        Add Your Skills
+      </Typography>
       <TextField
         label="Skill"
         variant="outlined"
         value={newSkill}
         onChange={handleSkillChange}
+        sx={{ marginBottom: '16px' }}
       />
 
-      <Box>
-        <Button variant="contained" onClick={handleAddSkill}>
-          Add Skill
-        </Button>
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          marginBottom: '16px',
+        }}
+      >
+        {skills.map((skill) => (
+          <Chip
+            key={skill}
+            label={skill}
+            onDelete={() => handleRemoveSkill(skill)}
+            color="secondary"
+            sx={{
+              margin: '4px',
+              backgroundColor: '#E0E0E0',
+              color: '#333',
+              '&:hover': {
+                backgroundColor: '#BDBDBD',
+              },
+            }}
+          />
+        ))}
       </Box>
 
-      <Box>
-        <Button variant="contained" onClick={handleSaveProfile}>
+      <Box
+        sx={{
+          marginBottom: '16px', // Added spacing between the text field and buttons
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <Button
+          variant="contained"
+          onClick={handleAddSkill}
+          sx={{
+            marginBottom: '8px',
+            backgroundColor: '#4caf50',
+            color: '#fff',
+            '&:hover': {
+              backgroundColor: '#45a049',
+            },
+          }}
+        >
+          Add Skill
+        </Button>
+        <Button
+          variant="contained"
+          onClick={handleSaveProfile}
+          sx={{
+            backgroundColor: '#f44336',
+            color: '#fff',
+            '&:hover': {
+              backgroundColor: '#d32f2f',
+            },
+          }}
+        >
           Create Profile
         </Button>
       </Box>
-    </div>
+    </Box>
   );
 };
 

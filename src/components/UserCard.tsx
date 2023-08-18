@@ -25,7 +25,7 @@ const UserCard: React.FC<UserCardProps> = ({ user }) => {
         <Typography>Email: {user.email}</Typography>
         <Typography>Name: {user.firstName}</Typography>
         <Typography>Availability: {user.availability.join(', ')}</Typography>
-        <Typography>Skills: {user.skills.join(', ')}</Typography>
+        <Typography>Skills: {user.skills.join(',')}</Typography>
       </CardContent>
     </Card>
   );

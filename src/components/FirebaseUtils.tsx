@@ -7,7 +7,6 @@ import {
   collection,
   getDocs,
 } from 'firebase/firestore';
-import { UserCredential } from 'firebase/auth';
 
 // Function to check if the user exists in the Firestore database
 export async function userExistsInDatabase(uid: string): Promise<boolean> {
